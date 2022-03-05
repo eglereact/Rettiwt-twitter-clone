@@ -1,4 +1,5 @@
 import { HiOutlineSparkles } from 'react-icons/hi'
+import Input from './Input'
 
 function Feed() {
   return (
@@ -12,6 +13,7 @@ function Feed() {
           <HiOutlineSparkles className="h-5 text-[#0F1419]" />
         </div>
       </div>
+      <Input />
     </div>
   )
 }
