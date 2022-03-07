@@ -40,7 +40,30 @@ function Input() {
     if (loading) return;
     setLoading(true);
 
-    const docRef = await addDoc();
+    const docRef = await addDoc(collection(db, 'posts'), {
+      // id: session.user.uid,
+      // username: session.user.name,
+      // userImg: session.user.image,
+      // tag: session.user.tag,
+      text: input,
+      timestamp: serverTimestamp(),
+    });
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+    if (selectedFile) {
+      await uploadString(imageRef, selectedFile, 'data_url').then(async () => {
+        const downloadUrl = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, 'posts', docRef.id), {
+          image: downloadUrl,
+        });
+      });
+    }
+
+    setLoading(false);
+    setInput('');
+    setSelectedFile(null);
+    setShowEmojis(false);
   };
 
   return (
