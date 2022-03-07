@@ -9,11 +9,21 @@ import { HiOutlineLocationMarker, HiOutlinePhotograph } from 'react-icons/hi';
 import { RiBarChartHorizontalFill } from 'react-icons/ri';
 import 'emoji-mart/css/emoji-mart.css';
 import { Picker } from 'emoji-mart';
+import { db, storage } from '../firebase';
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from '@firebase/firestore';
+import { getDownloadURL, ref, uploadString } from '@firebase/storage';
 
 function Input() {
   const [input, setInput] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojis, setShowEmojis] = useState(false);
+  const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
 
   const addImageToPost = () => {};
@@ -24,6 +34,13 @@ function Input() {
     sym.forEach((el) => codesArray.push('0x' + el));
     let emoji = String.fromCodePoint(...codesArray);
     setInput(input + emoji);
+  };
+
+  const sendPost = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    const docRef = await addDoc();
   };
 
   return (
@@ -108,6 +125,7 @@ function Input() {
             className="rounded-full bg-[#1d9bf0] px-4 py-1.5 font-bold text-white shadow-md
           hover:bg-[#1a8cd8] disabled:cursor-default disabled:opacity-50 disabled:hover:bg-[#1d9bf0]"
             disabled={!input.trim() && !selectedFile}
+            onClick={sendPost}
           >
             Tweet
           </button>
