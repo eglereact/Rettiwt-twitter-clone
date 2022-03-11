@@ -26,7 +26,15 @@ function Input() {
   const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
 
-  const addImageToPost = () => {};
+  const addImageToPost = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
+  };
 
   const addEmoji = (e) => {
     let sym = e.unified.split('-');
@@ -68,7 +76,9 @@ function Input() {
 
   return (
     <div
-      className={`flex space-x-3 overflow-y-scroll border-b border-gray-100 p-3`}
+      className={`flex space-x-3 overflow-y-scroll border-b border-gray-100 p-3 ${
+        loading && 'opaticy-60'
+      }`}
     >
       <img
         src="https://styles.redditmedia.com/t5_505g04/styles/profileIcon_snooad6477ea-4207-4b46-a376-476bf6c21d57-headshot.png?width=256&height=256&crop=256:256,smart&s=9306e431eacd8815477d0c8bc12ae3ebc8c451b7"
@@ -101,58 +111,64 @@ function Input() {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-between pt-2.5">
-          <div className="flex items-center">
-            <div className="icon" onClick={() => filePickerRef.current.click()}>
-              <HiOutlinePhotograph className="h-[22px] text-2xl text-[#1D9BF0]" />
-              <input
-                type="file"
-                hidden
-                onChange={addImageToPost}
-                ref={filePickerRef}
-              />
+
+        {!loading && (
+          <div className="flex items-center justify-between pt-2.5">
+            <div className="flex items-center">
+              <div
+                className="icon"
+                onClick={() => filePickerRef.current.click()}
+              >
+                <HiOutlinePhotograph className="h-[22px] text-2xl text-[#1D9BF0]" />
+                <input
+                  type="file"
+                  hidden
+                  onChange={addImageToPost}
+                  ref={filePickerRef}
+                />
+              </div>
+              <div className="icon">
+                <AiOutlineGif className="h-[22px] text-2xl text-[#1D9BF0]" />
+              </div>
+              <div className="icon">
+                <RiBarChartHorizontalFill className="h-[22px] text-2xl text-[#1D9BF0]" />
+              </div>
+              <div className="icon">
+                <AiOutlineSmile
+                  onClick={() => setShowEmojis(!showEmojis)}
+                  className="h-[22px] text-2xl text-[#1D9BF0]"
+                />
+              </div>
+              <div className="icon">
+                <AiOutlineSchedule className="h-[22px] text-2xl text-[#1D9BF0]" />
+              </div>
+              <div className="icon">
+                <HiOutlineLocationMarker className="h-[22px] text-2xl text-[#1D9BF0]" />
+              </div>
+              {showEmojis && (
+                <Picker
+                  onSelect={addEmoji}
+                  style={{
+                    position: 'absolute',
+                    marginTop: '465px',
+                    marginLeft: -40,
+                    maxWidth: '320px',
+                    borderRadius: '20px',
+                  }}
+                  theme="light"
+                />
+              )}
             </div>
-            <div className="icon">
-              <AiOutlineGif className="h-[22px] text-2xl text-[#1D9BF0]" />
-            </div>
-            <div className="icon">
-              <RiBarChartHorizontalFill className="h-[22px] text-2xl text-[#1D9BF0]" />
-            </div>
-            <div className="icon">
-              <AiOutlineSmile
-                onClick={() => setShowEmojis(!showEmojis)}
-                className="h-[22px] text-2xl text-[#1D9BF0]"
-              />
-            </div>
-            <div className="icon">
-              <AiOutlineSchedule className="h-[22px] text-2xl text-[#1D9BF0]" />
-            </div>
-            <div className="icon">
-              <HiOutlineLocationMarker className="h-[22px] text-2xl text-[#1D9BF0]" />
-            </div>
-            {showEmojis && (
-              <Picker
-                onSelect={addEmoji}
-                style={{
-                  position: 'absolute',
-                  marginTop: '465px',
-                  marginLeft: -40,
-                  maxWidth: '320px',
-                  borderRadius: '20px',
-                }}
-                theme="light"
-              />
-            )}
-          </div>
-          <button
-            className="rounded-full bg-[#1d9bf0] px-4 py-1.5 font-bold text-white shadow-md
+            <button
+              className="rounded-full bg-[#1d9bf0] px-4 py-1.5 font-bold text-white shadow-md
           hover:bg-[#1a8cd8] disabled:cursor-default disabled:opacity-50 disabled:hover:bg-[#1d9bf0]"
-            disabled={!input.trim() && !selectedFile}
-            onClick={sendPost}
-          >
-            Tweet
-          </button>
-        </div>
+              disabled={!input.trim() && !selectedFile}
+              onClick={sendPost}
+            >
+              Tweet
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
