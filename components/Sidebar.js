@@ -1,10 +1,12 @@
-import React from 'react'
-import { FaTwitter } from 'react-icons/fa'
-import SidebarLink from './SidebarLink'
-import { data } from './../sidebarData'
-import { FiMoreVertical } from 'react-icons/fi'
+import React from 'react';
+import { FaTwitter } from 'react-icons/fa';
+import SidebarLink from './SidebarLink';
+import { data } from './../sidebarData';
+import { FiMoreVertical } from 'react-icons/fi';
+import { signOut, useSession } from 'next-auth/react';
 
 function Sidebar() {
+  const { data: session } = useSession();
   return (
     <div className="fixed hidden h-full flex-col items-center p-2 sm:flex xl:w-[340px] xl:items-start">
       <div className="hoverAnimation flex h-14 w-14 items-center justify-center p-0 xl:ml-24">
@@ -26,20 +28,23 @@ function Sidebar() {
       >
         Tweet
       </button>
-      <div className="hoverAnimation mt-auto flex items-center justify-center xl:mr-1 xl:ml-auto">
+      <div
+        className="hoverAnimation mt-auto flex items-center justify-center xl:mr-1 xl:ml-auto"
+        onClick={signOut}
+      >
         <img
-          src="https://styles.redditmedia.com/t5_505g04/styles/profileIcon_snooad6477ea-4207-4b46-a376-476bf6c21d57-headshot.png?width=256&height=256&crop=256:256,smart&s=9306e431eacd8815477d0c8bc12ae3ebc8c451b7"
+          src={session.user.image}
           alt=""
           className="h-10 w-10 rounded-full xl:mr-2.5"
         />
         <div className="hidden leading-5 xl:inline">
-          <h4 className="font-bold">Egle React</h4>
-          <p className="text-gray-600">@elgereact</p>
+          <h4 className="font-bold">{session.user.name}</h4>
+          <p className="text-gray-600">@{session.user.tag}</p>
         </div>
         <FiMoreVertical className="ml-10 hidden h-5 xl:inline" />
       </div>
     </div>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

@@ -18,6 +18,7 @@ import {
   updateDoc,
 } from '@firebase/firestore';
 import { getDownloadURL, ref, uploadString } from '@firebase/storage';
+import { useSession } from 'next-auth/react';
 
 function Input() {
   const [input, setInput] = useState('');
@@ -25,6 +26,7 @@ function Input() {
   const [showEmojis, setShowEmojis] = useState(false);
   const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
+  const { data: session } = useSession();
 
   const addImageToPost = (e) => {
     const reader = new FileReader();
@@ -49,10 +51,10 @@ function Input() {
     setLoading(true);
 
     const docRef = await addDoc(collection(db, 'posts'), {
-      // id: session.user.uid,
-      // username: session.user.name,
-      // userImg: session.user.image,
-      // tag: session.user.tag,
+      id: session.user.uid,
+      username: session.user.name,
+      userImg: session.user.image,
+      tag: session.user.tag,
       text: input,
       timestamp: serverTimestamp(),
     });
@@ -81,7 +83,7 @@ function Input() {
       }`}
     >
       <img
-        src="https://styles.redditmedia.com/t5_505g04/styles/profileIcon_snooad6477ea-4207-4b46-a376-476bf6c21d57-headshot.png?width=256&height=256&crop=256:256,smart&s=9306e431eacd8815477d0c8bc12ae3ebc8c451b7"
+        src={session.user.image}
         alt=""
         className="h-11 w-11 cursor-pointer rounded-full"
       />
