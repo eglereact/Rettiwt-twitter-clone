@@ -1,6 +1,13 @@
-import { deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  setDoc,
+} from 'firebase/firestore';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import {
   BsChat,
   BsThreeDots,
@@ -18,7 +25,36 @@ function Post({ id, post, postPage }) {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useRecoilState(modalState);
   const [postId, setPostId] = useRecoilState(postIdState);
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState([]);
   const router = useRouter();
+
+  useEffect(
+    () =>
+      onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) =>
+        setLikes(snapshot.docs)
+      ),
+    [db, id]
+  );
+
+  useEffect(
+    () =>
+      setLiked(
+        likes.findIndex((like) => like.id === session?.user?.uid) !== -1
+      ),
+    [likes]
+  );
+
+  const likePost = async () => {
+    if (liked) {
+      await deleteDoc(doc(db, 'posts', id, 'likes', session.user.uid));
+    } else {
+      await setDoc(doc(db, 'posts', id, 'likes', session.user.uid), {
+        username: session.user.name,
+      });
+    }
+  };
+
   return (
     <div
       className="flex cursor-pointer border-b border-[#F3F4F6] p-3"
@@ -108,21 +144,42 @@ function Post({ id, post, postPage }) {
                 router.push('/');
               }}
             >
-              <div className="group flex items-center space-x-1">
-                <div className="icon group hover:bg-[#fc4655] hover:bg-opacity-10">
-                  <BsTrash className="h-5 group-hover:text-[#fc4655]" />
-                </div>
+              <div className="icon group hover:bg-[#fc4655] hover:bg-opacity-10">
+                <BsTrash className="h-5 group-hover:text-[#fc4655]" />
               </div>
             </div>
           ) : (
-            <div className="icon group hover:bg-[#37C897] hover:bg-opacity-10">
-              <FiRepeat className="h-5 group-hover:text-[#37C897]" />
+            <div className="group flex items-center space-x-1">
+              <div className="icon group hover:bg-[#37C897] hover:bg-opacity-10">
+                <FiRepeat className="h-5 group-hover:text-[#37C897]" />
+              </div>
             </div>
           )}
 
           {/* Block for the likes */}
-          <div className="icon group hover:bg-[#F9318D] hover:bg-opacity-10">
-            <BsHeart className="h-5 group-hover:text-[#F9318D]" />
+          <div
+            className="group flex items-center space-x-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              likePost();
+            }}
+          >
+            <div className="icon group hover:bg-[#F9318D] hover:bg-opacity-10">
+              {liked ? (
+                <BsFillHeartFill className="h-5 text-[#F9318D]" />
+              ) : (
+                <BsHeart className="h-5 group-hover:text-[#F9318D]" />
+              )}
+            </div>
+            {likes.length > 0 && (
+              <span
+                className={`text-sm group-hover:text-[#F9318D] ${
+                  liked && 'text-[#F9318D]'
+                }`}
+              >
+                {likes.length}
+              </span>
+            )}
           </div>
           {/* Block for the share only visual */}
           <div className="icon group">
