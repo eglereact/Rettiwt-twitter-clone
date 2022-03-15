@@ -1,3 +1,4 @@
+import { deleteDoc, doc } from 'firebase/firestore';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import {
@@ -11,6 +12,7 @@ import { FiRepeat, FiShare } from 'react-icons/fi';
 import Moment from 'react-moment';
 import { useRecoilState } from 'recoil';
 import { modalState, postIdState } from '../atoms/modalAtom';
+import { db } from '../firebase';
 
 function Post({ id, post, postPage }) {
   const { data: session } = useSession();
@@ -95,10 +97,29 @@ function Post({ id, post, postPage }) {
               <BsChat className="h-5 group-hover:text-[#1d9bf0]" />
             </div>
           </div>
-          {/* Block for the retweet only visual */}
-          <div className="icon group hover:bg-[#37C897] hover:bg-opacity-10">
-            <FiRepeat className="h-5 group-hover:text-[#37C897]" />
-          </div>
+
+          {/* Block for the delete post & for the retweet only visual  */}
+          {session.user.uid === post?.id ? (
+            <div
+              className="group flex items-center space-x-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteDoc(doc(db, 'posts', id));
+                router.push('/');
+              }}
+            >
+              <div className="group flex items-center space-x-1">
+                <div className="icon group hover:bg-[#fc4655] hover:bg-opacity-10">
+                  <BsTrash className="h-5 group-hover:text-[#fc4655]" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="icon group hover:bg-[#37C897] hover:bg-opacity-10">
+              <FiRepeat className="h-5 group-hover:text-[#37C897]" />
+            </div>
+          )}
+
           {/* Block for the likes */}
           <div className="icon group hover:bg-[#F9318D] hover:bg-opacity-10">
             <BsHeart className="h-5 group-hover:text-[#F9318D]" />
@@ -106,10 +127,6 @@ function Post({ id, post, postPage }) {
           {/* Block for the share only visual */}
           <div className="icon group">
             <FiShare className="h-5 group-hover:text-[#1d9bf0]" />
-          </div>
-          {/* Block for the delete post */}
-          <div className="icon group hover:bg-[#fc4655] hover:bg-opacity-10">
-            <BsTrash className="h-5 group-hover:text-[#fc4655]" />
           </div>
         </div>
       </div>
