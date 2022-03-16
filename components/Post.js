@@ -3,6 +3,8 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
+  orderBy,
+  query,
   setDoc,
 } from 'firebase/firestore';
 import { useSession } from 'next-auth/react';
@@ -27,12 +29,25 @@ function Post({ id, post, postPage }) {
   const [postId, setPostId] = useRecoilState(postIdState);
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState([]);
+  const [comments, setComments] = useState([]);
   const router = useRouter();
 
   useEffect(
     () =>
       onSnapshot(collection(db, 'posts', id, 'likes'), (snapshot) =>
         setLikes(snapshot.docs)
+      ),
+    [db, id]
+  );
+
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, 'posts', id, 'comments'),
+          orderBy('timestamp', 'desc')
+        ),
+        (snapshot) => setComments(snapshot.docs)
       ),
     [db, id]
   );
@@ -132,6 +147,11 @@ function Post({ id, post, postPage }) {
             <div className="icon group">
               <BsChat className="h-5 group-hover:text-[#1d9bf0]" />
             </div>
+            {comments.length > 0 && (
+              <span className="text-sm group-hover:text-[#1d9bf0]">
+                {comments.length}
+              </span>
+            )}
           </div>
 
           {/* Block for the delete post & for the retweet only visual  */}
