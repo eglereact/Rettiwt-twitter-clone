@@ -33,13 +33,13 @@ function Sidebar() {
         onClick={signOut}
       >
         <img
-          src={session.user.image}
+          src={session?.user.image}
           alt=""
           className="h-10 w-10 rounded-full xl:mr-2.5"
         />
         <div className="hidden leading-5 xl:inline">
-          <h4 className="font-bold">{session.user.name}</h4>
-          <p className="text-gray-600">@{session.user.tag}</p>
+          <h4 className="font-bold">{session?.user.name}</h4>
+          <p className="text-gray-600">@{session?.user.tag}</p>
         </div>
         <FiMoreVertical className="ml-10 hidden h-5 xl:inline" />
       </div>
