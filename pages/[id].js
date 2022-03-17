@@ -8,15 +8,23 @@ import { modalState } from '../atoms/modalAtom';
 import { getProviders, getSession, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import { FiArrowLeft } from 'react-icons/fi';
+import Comment from '../components/Comment';
 
 function PostPage({ followResults, trendingResults, providers }) {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useRecoilState(modalState);
   const router = useRouter();
   const [post, setPost] = useState();
+  const [comments, setComments] = useState([]);
   const { id } = router.query;
 
   if (!session) return <Login providers={providers} />;
@@ -27,6 +35,18 @@ function PostPage({ followResults, trendingResults, providers }) {
         setPost(snapshot.data());
       }),
     [db]
+  );
+
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, 'posts', id, 'comments'),
+          orderBy('timestamp', 'desc')
+        ),
+        (snapshot) => setComments(snapshot.docs)
+      ),
+    [db, id]
   );
 
   return (
@@ -53,6 +73,17 @@ function PostPage({ followResults, trendingResults, providers }) {
             Tweet
           </div>
           <Post id={id} post={post} postPage />
+          {comments.length > 0 && (
+            <div className="pb-72">
+              {comments.map((comment) => (
+                <Comment
+                  key={comment.id}
+                  id={comment.id}
+                  comment={comment.data()}
+                />
+              ))}
+            </div>
+          )}
         </div>
         {isOpen && <Modal />}
       </main>
