@@ -4,6 +4,7 @@ import Feed from '../components/Feed';
 import { getProviders, getSession, useSession } from 'next-auth/react';
 import Login from '../components/Login';
 import Modal from '../components/Modal';
+import Widgets from '../components/Widgets';
 import { modalState } from '../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
 
@@ -20,6 +21,10 @@ function Home({ followResults, trendingResults, providers }) {
       <main className="mx-auto flex min-h-screen max-w-[1500px] bg-white">
         <Sidebar />
         <Feed />
+        <Widgets
+          trendingResults={trendingResults}
+          followResults={followResults}
+        />
         {isOpen && <Modal />}
       </main>
     </div>

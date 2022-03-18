@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import Modal from '../components/Modal';
 import Login from '../components/Login';
 import Post from '../components/Post';
+import Widgets from '../components/Widgets';
 import { useRecoilState } from 'recoil';
 import { modalState } from '../atoms/modalAtom';
 import { getProviders, getSession, useSession } from 'next-auth/react';
@@ -85,6 +86,10 @@ function PostPage({ followResults, trendingResults, providers }) {
             </div>
           )}
         </div>
+        <Widgets
+          trendingResults={trendingResults}
+          followResults={followResults}
+        />
         {isOpen && <Modal />}
       </main>
     </div>
